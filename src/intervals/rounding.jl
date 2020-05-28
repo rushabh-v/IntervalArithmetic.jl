@@ -165,7 +165,7 @@ for mode in (:Down, :Up)
                                 $f(a, b)
                             end
                         end
-        
+
         @eval function $f(::IntervalRounding{:tight},
                             a::T, b::T, $mode1) where T<:AbstractFloat
                       setrounding(T, $mode2) do
@@ -289,15 +289,15 @@ function _setrounding(::Type{Interval}, rounding_type::Symbol)
         @eval $f(a::T, b::T, r::RoundingMode) where {T<:AbstractFloat} = $f($roundtype, a, b, r)
     end
 
-    @eval ^(a::T, b::S, r::RoundingMode) where {T<:AbstractFloat, S<:Real} = ^($roundtype, promote(a, b)..., r)
+    @eval ^(a::T, b::S, r::R) where {T<:AbstractFloat, S<:Real, R<:RoundingMode} = ^($roundtype, promote(a, b)..., r)
 
     # unary functions:
     for f in vcat(CRlibm.functions,
                     [:tanh, :asinh, :acosh, :atanh])
 
-        @eval $f(a::T, r::RoundingMode) where {T<:AbstractFloat} = $f($roundtype, a, r)
+        @eval $f(a::T, r::R) where {T<:AbstractFloat, R<:RoundingMode} = $f($roundtype, a, r)
 
-        @eval $f(x::Real, r::RoundingMode) = $f(float(x), r)
+        @eval $f(x::T, r::R) where {T<:Real, R<:RoundingMode} = $f(float(x), r)
 
     end
 
