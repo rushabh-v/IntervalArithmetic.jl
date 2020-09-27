@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Input&amp;Output · IntervalArithmetic</title><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit">IntervalArithmetic</span></div><form class="docs-search" action="../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../">Package</a></li><li><a class="tocitem" href="../intro/">Interval Arithmetic</a></li><li><a class="tocitem" href="../construction/">Constructing intervals</a></li><li><a class="tocitem" href="../usage/">Basic usage</a></li><li><a class="tocitem" href="../decorations/">Decorations</a></li><li><a class="tocitem" href="../multidim/">Multi-dimensional boxes</a></li><li><a class="tocitem" href="../rounding/">Rounding</a></li><li><a class="tocitem" href="../api/">API</a></li><li class="is-active"><a class="tocitem" href>Input&amp;Output</a><ul class="internal"><li class="toplevel"><a class="tocitem" href="#Output"><span>Output</span></a></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>Input&amp;Output</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Input&amp;Output</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/JuliaIntervals/IntervalArithmetic.jl/blob/master/docs/src/input_output.md" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Input"><a class="docs-heading-anchor" href="#Input">Input</a><a id="Input-1"></a><a class="docs-heading-anchor-permalink" href="#Input" title="Permalink"></a></h1><p><code>IntervalArtihmetic</code> allows to construct intervals using a string as input. The function <code>parse</code> converts the input string into an interval.</p><ul><li><p>parse(::Interval{Type}, ::String)</p><p>The various string formats are as follows:</p><ul><li>No string parameter or <code>Empty</code> string (&quot;[Empty]&quot;) returns an empty interval.</li><li><code>entire</code> (&quot;[entire]&quot;) and &quot;[,]&quot; string returns entireinterval</li><li>&quot;[nai]&quot; returns <code>Nai{Type}</code></li><li>&quot;[m]&quot; returns <code>Interval(m,m)</code></li><li>&quot;[l, r]&quot; returns <code>Interval(l, r)</code></li><li>&quot;m?r&quot; returns <code>Interval(m-r, m+r)</code></li><li>&quot;m?ren&quot; returns <code>Interval((m-r)en, (m+r)en)</code></li><li>&quot;m?ru&quot; or &quot;m?rd&quot; returns <code>Interval(m, m+r)</code> or <code>Interval(m-r, m)</code> respectively</li><li>&quot;m?&quot; returns <code>Interval(m + 5 precision units, m - 5 precision units)</code></li><li>&quot;m??&quot; returns <code>Interval(-Inf, +Inf)</code></li><li>&quot;m??u&quot; or &quot;m??d&quot; returns <code>Interval(m, +Inf)</code> or <code>Interval(-Inf, m) respectively</code></li></ul><p>Similarly, for decorated interval add <code>_dec</code> at the end of the string otherwise decoration is determined using <code>decoration</code> function.</p><pre><code class="language-jl">
+julia&gt; parse(Interval{Float64}, &quot;[1, 2]&quot;)
+[1, 2]
+
+julia&gt; parse(Interval{Float64}, &quot;3.56?1&quot;)
+[3.54999, 3.57001]
+
+julia&gt; parse(Interval{Float64}, &quot;-10?&quot;)
+[-10.5, -9.5]
+
+julia&gt; parse(DecoratedInterval{Float64}, &quot;[3, 4]&quot;)
+[3, 4]
+
+julia&gt; parse(DecoratedInterval{Float64}, &quot;[3, 4]_dac&quot;)
+[3, 4]
+
+julia&gt; decoration(parse(DecoratedInterval{Float64}, &quot;[3, 4]_dac&quot;))
+dac::DECORATION = 3
+</code></pre></li></ul><h1 id="Output"><a class="docs-heading-anchor" href="#Output">Output</a><a id="Output-1"></a><a class="docs-heading-anchor-permalink" href="#Output" title="Permalink"></a></h1><p><code>IntervalArtihmetic</code> converts an interval and returns string which contains the input interval. The function <code>intervaltotext</code> takes a string conversion specifier <code>cs</code> as parameter and converts the interval to string accordingly.</p><p>-intervaltotext(::Interval)</p><p>Without conversion specifier, the <code>intervaltotext</code> function returns the input interval as string with maximum 5 digits of precision.</p><p>-intervaltotext(::Interval, ::string)</p><p>The format for default(infsup) string output is   <code>&quot;overall_width : [ flags width . precision conversion]&quot;</code></p><ul><li><p>overall_width, if specified denotes the length of the string. It must be followed by colon sign.</p></li><li><p>The following flags specify different format to output the string. &#39;C&#39;   Returns upper case for Empty, Entire and Nai &#39;c&#39;   Returns lower case for Empty, Entire and Nai &#39;&lt;&#39;   Returns Entire as [-Inf, +Inf] instead of [Entire] &#39;0&#39;   Left-pads the numbers with zeros instead of spaces within the field width</p></li><li><p>The width specifies the length of lower and upper bound.</p></li><li><p>The precision for upper and lower bound denotes the number of digits after decimal.</p></li><li><p>conversion determines the format of output interval string. &#39;e&#39; of &#39;E&#39; as conversion returns the interval in scientific notation. No conversion or any other letter returns default floating point representation.</p></li></ul><p>The format of <code>cs</code> for uncertain string output is   <code>&quot;overall_width : flags width . precision ? radius_width conversion&quot;</code></p><ul><li><p>overall_width, if specified denotes the length of the string. It must be followed by colon sign.</p></li><li><p>The following flags specify different format to output the string. &#39;d&#39;   Returns the interval with midpoint as upper bound and radius taken in downward direction. &#39;u&#39;   Returns the interval with midpoint as lower bound and radius taken in upward direction. &#39;C&#39;   Returns upper case for Empty, Entire and Nai &#39;c&#39;   Returns lower case for Empty, Entire and Nai &#39;+&#39;   Returns postitve numbers with &#39;+&#39; sign before the number &#39;0&#39;   Left-pads the numbers with zeros instead of spaces within the field width</p></li><li><p>The field width specifies the length of midpoint string.</p></li><li><p>The precision denotes the number of digits after decimal in the midpoint.</p></li><li><p>The radius_width specify the width of the radius. The radius is padded with zeroes.</p></li><li><p>conversion determines the format of output interval string. &#39;e&#39; or &#39;E&#39; as conversion returns the interval in scientific notation. No conversion or any other letter returns default floating point representation.</p></li></ul><pre><code class="language-jl">
+julia&gt; interval_to_string(Interval(1, 4))
+&quot;[1, 4]&quot;
+
+julia&gt; interval_to_string(Interval(1.123423423, 4.1334224))
+&quot;[1.12342, 4.13343]&quot;
+
+julia&gt; interval_to_string(Interval(2.3534534644, 3.564537887687), &quot;8 : [c  .  ]&quot;)
+&quot;[2.3, 4]&quot;
+
+julia&gt; interval_to_string(Interval(2.3534534644, 3.564537887687), &quot; : [ 3 .  ]&quot;)
+&quot;[2.3, 3.6]&quot;
+
+julia&gt; interval_to_string(Interval(2.3534534644, 3.564537887687), &quot; : [ . 3 ]&quot;)
+&quot;[2.353, 3.565]&quot;
+
+julia&gt; interval_to_string(Interval(2.3534534644, 3.564537887687), &quot; : [ 4 . 2 ]&quot;)
+&quot;[2.35, 3.57]&quot;
+
+julia&gt; interval_to_string(Interval(2.3534534644, 3.564537887687), &quot;14 : [ . 3 ]&quot;)
+&quot;[2.353, 3.565]&quot;
+
+julia&gt; interval_to_string(Interval(2.3534534644, 3.564537887687), &quot;12 : [ 3 . 1]&quot;)
+&quot;  [2.3, 3.6]&quot;
+
+julia&gt; interval_to_string(Interval(23.534534644, 100.64537887687), &quot;12 : [ .  e]&quot;)
+&quot;[2.3e1, 2e2]&quot;
+
+julia&gt; interval_to_string(Interval(23.534534644, 100.64537887687), &quot;14 : [ .  e]&quot;)
+&quot;[2.3e1, 1.1e2]&quot;
+
+julia&gt; interval_to_string(Interval(2.3534534644, 3.564537887687), &quot; : [ 5 .  e]&quot;)
+&quot;[2.3e0, 3.6e0]&quot;
+
+julia&gt; interval_to_string(Interval(2.3534534644, 30.564537887687), &quot; : [ . 2 e]&quot;)
+&quot;[2.35e0, 3.06e1]&quot;
+
+julia&gt; interval_to_string(Interval(2.3534534644, 3.564537887687), &quot; : [ 6 . 1 e]&quot;)
+&quot;[ 2.3e0,  3.6e0]&quot;
+
+julia&gt; interval_to_string(Interval(2.3534534644, 3.564537887687), &quot;18 : [ . 3 e]&quot;)
+&quot;[2.353e0, 3.565e0]&quot;
+
+julia&gt; interval_to_string(Interval(2.3534534644, 3.564537887687), &quot;16 : [ 5 . 1 e]&quot;)
+&quot;  [2.3e0, 3.6e0]&quot;
+
+julia&gt; interval_to_string(3.55 .. 3.578, &quot;6 :  4 . 2 ?&quot;)
+&quot;3.56?2&quot;
+
+julia&gt; interval_to_string(3.55 .. 3.578, &quot;8 :u 4 . 2 ?&quot;)
+&quot; 3.55?3u&quot;
+
+julia&gt; interval_to_string(3.55 .. 3.578, &quot;8 :d 4 . 2 ?&quot;)
+&quot; 3.58?3d&quot;
+
+julia&gt; interval_to_string(Interval(3.555, 3.565), &quot;7 : . 3 ?&quot;)
+&quot;3.560?5&quot;
+
+julia&gt; interval_to_string(Interval(3.555, 3.565), &quot;8 :0 6 . 3 ?&quot;)
+&quot;03.560?5&quot;
+
+julia&gt; interval_to_string(35.5 .. 36.78, &quot;8 :  4 . 2 ? 1 e&quot;)
+&quot;3.61?7e1&quot;
+
+julia&gt; interval_to_string(35.55 .. 35.65, &quot;9 : . 3 ? 1 e&quot;)
+&quot;3.560?6e1&quot;
+
+julia&gt; interval_to_string(3.55 .. 3.578, &quot;6 :  4 .  ?&quot;)
+&quot;3.56?2&quot;
+
+julia&gt; interval_to_string(3.55 .. 3.578, &quot; :u 4 .  ?&quot;)
+&quot;3.55?3u&quot;
+
+julia&gt; interval_to_string(Interval(3.555, 3.565), &quot;7 : .  ?&quot;)
+&quot;3.560?6&quot;
+
+julia&gt; interval_to_string(35.5 .. 35.78, &quot;8 :  4 .  ? e&quot;)
+&quot;3.56?2e1&quot;
+
+julia&gt; interval_to_string(Interval(35.55, 35.65), &quot;9 : .  ? e&quot;)
+&quot;3.560?6e1&quot;  
+</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../api/">« API</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Sunday 27 September 2020 20:11">Sunday 27 September 2020</span>. Using Julia version 1.3.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
